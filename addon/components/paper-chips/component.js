@@ -38,6 +38,10 @@ class PaperChips extends Component {
     if (!this.readOnly && isEmpty(input.value) && this.content.length) {
       this.keyboardNavigation(ev, input);
     }
+
+    if (!this.readOnly && !isEmpty(input.value)) {
+      this.handleInputKeydown(ev);
+    }
   }
 
   keyboardNavigation(ev, input) {
