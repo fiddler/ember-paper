@@ -22,7 +22,6 @@ import { invokeAction } from 'ember-paper/utils/invoke-action';
 export default Component.extend(FocusableMixin, ParentMixin, {
   layout,
   tagName: 'md-radio-group',
-  tabindex: 0,
 
   /* FocusableMixin Overrides */
   focusOnlyOnKey: true,
@@ -30,6 +29,7 @@ export default Component.extend(FocusableMixin, ParentMixin, {
   radioComponent: 'paper-radio',
   labelComponent: 'paper-radio-group-label',
   role: 'radiogroup',
+  tabindex: null,
 
   constants: service(),
 

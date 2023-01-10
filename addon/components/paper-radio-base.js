@@ -3,6 +3,7 @@
  * @module ember-paper
  */
 import Component from '@ember/component';
+import { inject as service } from '@ember/service';
 
 import { computed } from '@ember/object';
 import { assert } from '@ember/debug';
@@ -28,13 +29,13 @@ export default Component.extend(FocusableMixin, ColorMixin, {
     'ariaLabel:aria-label'
   ],
 
-  tabindex: null,
-
   toggle: false,
   role: 'radio',
 
   /* FocusableMixin Overrides */
   focusOnlyOnKey: true,
+
+  constants: service(),
 
   // Lifecycle hooks
   init() {
@@ -64,5 +65,15 @@ export default Component.extend(FocusableMixin, ColorMixin, {
     }
     // Prevent bubbling, if specified. If undefined, the event will bubble.
     return this.bubbles;
-  }
+  },
+
+  keyPress(ev) {
+    if (
+      ev.which === this.get('constants.KEYCODE.SPACE') ||
+      ev.which === this.get('constants.KEYCODE.ENTER')
+    ) {
+      ev.preventDefault();
+      this.click();
+    }
+  },
 });
