@@ -84,12 +84,13 @@ class MenuPositionCalculator {
         if (this.positionMode.top === 'target' || this.positionMode.left === 'target' || this.positionMode.left === 'target-right') {
             alignTarget = firstVisibleChild(this.openMenuNode);
             if (alignTarget) {
-                // TODO: Allow centering on an arbitrary node, for now center on first menu-item's child
-                alignTarget = alignTarget.firstElementChild || alignTarget;
-                alignTarget = alignTarget.querySelector('md-icon') || alignTarget.querySelector('.md-menu-align-target') || alignTarget;
+              alignTarget =
+                alignTarget.querySelector('.md-menu-align-target') ||
+                alignTarget.querySelector('md-icon') ||
+                alignTarget.firstElementChild ||
+                alignTarget;
             }
         }
-
         return alignTarget;
     }
 
