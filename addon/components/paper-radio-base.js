@@ -69,8 +69,8 @@ export default Component.extend(FocusableMixin, ColorMixin, {
 
   keyPress(ev) {
     if (
-      ev.which === this.get('constants.KEYCODE.SPACE') ||
-      ev.which === this.get('constants.KEYCODE.ENTER')
+      ev.which === this.constants.KEYCODE.SPACE ||
+      ev.which === this.constants.KEYCODE.ENTER
     ) {
       ev.preventDefault();
       this.click();
