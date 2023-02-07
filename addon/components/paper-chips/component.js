@@ -28,7 +28,9 @@ class PaperChips extends Component {
 
   @action
   handleClick(ev) {
-    ev.currentTarget.querySelector('.md-chip-input-container input').focus();
+    if (!this.readOnly) {
+      ev.currentTarget.querySelector('.md-chip-input-container input').focus();
+    }
   }
 
   @action
