@@ -149,6 +149,7 @@ class PaperChips extends Component {
   handleInputKeydown(ev) {
     if (ev.key === 'Enter') {
       this.handleAddItem(ev.target.value);
+      ev.preventDefault();
       ev.target.value = '';
     }
   }
