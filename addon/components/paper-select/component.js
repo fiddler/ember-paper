@@ -180,7 +180,10 @@ class PaperSelect extends Component.extend(ValidationMixin, ChildMixin) {
         + centeredRect.paddingRight}px`;
     }
 
-    let containerRect = containerNode.getBoundingClientRect();
+    const containerRect = {
+      width: containerNode.offsetWidth,
+      height: containerNode.offsetHeight,
+    };
 
     let dropdownTop = clamp(bounds.top, top, bounds.bottom - containerRect.height);
     let dropdownLeft = clamp(bounds.left, left, bounds.right - containerRect.width);
