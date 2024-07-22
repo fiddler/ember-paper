@@ -47,6 +47,7 @@
       <div class="md-chip-input-container">
         {{#if (or @requireMatch @options)}}
           <PaperAutocomplete
+            @disabled={{@disabled}}
             @inputClass="md-input"
             @options={{@options}}
             @closeOnSelect={{true}}
