@@ -1,0 +1,9 @@
+{{! template-lint-disable no-action }}
+{{#in-element this.destinationEl insertBefore=null}}
+  <PaperBackdrop @locked-open={{@isLockedOpen}} @opaque={{this.opaque}} @fixed={{unless @parent true}} @class="md-dialog-backdrop" @onClick={{action "outsideClicked"}} />
+  <PaperDialogContainer @class={{readonly @dialogContainerClass}} @outsideClicked={{action "outsideClicked"}}>
+    <PaperDialogInner @class={{readonly @class}} @origin={{@origin}} @defaultedParent={{this.defaultedParent}} @defaultedOpenFrom={{this.defaultedOpenFrom}} @defaultedCloseTo={{this.defaultedCloseTo}} @fullscreen={{@fullscreen}} @focusOnOpen={{this.focusOnOpen}}>
+      {{yield}}
+    </PaperDialogInner>
+  </PaperDialogContainer>
+{{/in-element}}

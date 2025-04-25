@@ -1,9 +1,9 @@
-/* eslint-disable ember/require-computed-property-dependencies, ember/no-actions-hash */
+/* eslint-disable ember/no-actions-hash, ember/require-computed-property-dependencies, prettier/prettier */
 import { filter } from '@ember/object/computed';
 import Controller from '@ember/controller';
 import { computed } from '@ember/object';
 import { A } from '@ember/array';
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 export default Controller.extend({
   fruitNames: A(['Apple', 'Banana', 'Orange']),
@@ -18,9 +18,9 @@ export default Controller.extend({
 
     for (let i = 0; i < numOfContacts; i++) {
       contacts.push({
-        name: faker.name.findName(),
+        name: faker.person.fullName(),
         email: faker.internet.email(),
-        image: faker.internet.avatar()
+        image: faker.image.avatar(),
       });
     }
 
@@ -42,13 +42,13 @@ export default Controller.extend({
     let numOfContacts = this.numOfContacts;
 
     for (let i = 0; i < numOfContacts; i++) {
-      let firstName = faker.name.firstName();
-      let lastName = faker.name.lastName();
+      let firstName = faker.person.firstName();
+      let lastName = faker.person.lastName();
 
       contacts.push({
         shortName: `${firstName} ${lastName[0]}`,
         emailAddress: `${firstName.toLowerCase()}.${lastName[0].toLowerCase()}@example.com`,
-        profileImage: faker.internet.avatar()
+        profileImage: faker.image.avatar(),
       });
     }
 

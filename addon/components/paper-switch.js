@@ -1,4 +1,4 @@
-/* eslint-disable ember/no-classic-components, no-unused-vars, ember/no-mixins, ember/require-tagless-components, ember/no-component-lifecycle-hooks, ember/no-get */
+/* eslint-disable ember/no-classic-components, ember/no-component-lifecycle-hooks, ember/no-get, ember/no-mixins, ember/require-tagless-components, no-unused-vars */
 /**
  * @module ember-paper
  */
@@ -7,11 +7,9 @@ import { inject as service } from '@ember/service';
 import Component from '@ember/component';
 import { assert } from '@ember/debug';
 import { get, computed } from '@ember/object';
-import { run } from '@ember/runloop';
-import { htmlSafe } from '@ember/string';
-import layout from '../templates/components/paper-switch';
+import { bind } from '@ember/runloop';
+import { htmlSafe } from '@ember/template';
 import FocusableMixin from 'ember-paper/mixins/focusable-mixin';
-import ColorMixin from 'ember-paper/mixins/color-mixin';
 import ProxiableMixin from 'ember-paper/mixins/proxiable-mixin';
 import { invokeAction } from 'ember-paper/utils/invoke-action';
 
@@ -21,29 +19,34 @@ import { invokeAction } from 'ember-paper/utils/invoke-action';
  * @class PaperSwitch
  * @extends Ember.Component
  * @uses FocusableMixin
- * @uses ColorMixin
  * @uses ProxiableMixin
  */
-export default Component.extend(FocusableMixin, ColorMixin, ProxiableMixin, {
-  layout,
+export default Component.extend(FocusableMixin, ProxiableMixin, {
   tagName: 'md-switch',
   classNames: ['paper-switch', 'md-default-theme'],
-  classNameBindings: ['value:md-checked', 'dragging:md-dragging'],
+  classNameBindings: [
+    'value:md-checked',
+    'dragging:md-dragging',
+    'warn:md-warn',
+    'accent:md-accent',
+    'primary:md-primary',
+  ],
   toggle: true,
   constants: service(),
-
   value: false,
   disabled: false,
   dragging: false,
 
-  thumbContainerStyle: computed('dragging', 'dragAmount', function() {
+  thumbContainerStyle: computed('dragging', 'dragAmount', function () {
     if (!this.dragging) {
       return htmlSafe('');
     }
 
     let translate = Math.max(0, Math.min(100, this.dragAmount * 100));
     let transformProp = `translate3d(${translate}%, 0, 0)`;
-    return htmlSafe(`transform: ${transformProp};-webkit-transform: ${transformProp}`);
+    return htmlSafe(
+      `transform: ${transformProp};-webkit-transform: ${transformProp}`
+    );
   }),
 
   didInsertElement() {
@@ -57,7 +60,10 @@ export default Component.extend(FocusableMixin, ColorMixin, ProxiableMixin, {
 
   init() {
     this._super(...arguments);
-    assert('{{paper-switch}} requires an `onChange` action or null for no action.', this.onChange !== undefined);
+    assert(
+      '{{paper-switch}} requires an `onChange` action or null for no action.',
+      this.onChange !== undefined
+    );
   },
 
   willDestroyElement() {
@@ -78,7 +84,10 @@ export default Component.extend(FocusableMixin, ColorMixin, ProxiableMixin, {
   },
 
   _setupSwitch() {
-    this.set('switchWidth', this.element.querySelector('.md-thumb-container').offsetWidth);
+    this.set(
+      'switchWidth',
+      this.element.querySelector('.md-thumb-container').offsetWidth
+    );
 
     let switchContainer = this.element.querySelector('.md-container');
     let switchHammer = new Hammer(switchContainer);
@@ -86,19 +95,20 @@ export default Component.extend(FocusableMixin, ColorMixin, ProxiableMixin, {
 
     // Enable dragging the switch container
     switchHammer.get('pan').set({ threshold: 1 });
-    switchHammer.on('panstart', run.bind(this, this._dragStart))
-      .on('panmove', run.bind(this, this._drag))
-      .on('panend', run.bind(this, this._dragEnd));
+    switchHammer
+      .on('panstart', bind(this, this._dragStart))
+      .on('panmove', bind(this, this._drag))
+      .on('panend', bind(this, this._dragEnd));
 
     // Enable tapping gesture on the switch
     this._switchHammer = new Hammer(this.element);
-    this._switchHammer.on('tap', run.bind(this, this._dragEnd));
+    this._switchHammer.on('tap', bind(this, this._dragEnd));
 
-    this._onClickHandleNativeClick = run.bind(this, this._handleNativeClick);
+    this._onClickHandleNativeClick = bind(this, this._handleNativeClick);
 
-    this.element.querySelector('.md-container')
+    this.element
+      .querySelector('.md-container')
       .addEventListener('click', this._onClickHandleNativeClick);
-
   },
 
   _handleNativeClick(ev) {
@@ -116,7 +126,8 @@ export default Component.extend(FocusableMixin, ColorMixin, ProxiableMixin, {
       this._switchContainerHammer.destroy();
       this._switchHammer.destroy();
     }
-    this.element.querySelector('.md-container')
+    this.element
+      .querySelector('.md-container')
       .removeEventListener('click', this._onClickHandleNativeClick);
     this._onClickHandleNativeClick = null;
   },
@@ -138,7 +149,11 @@ export default Component.extend(FocusableMixin, ColorMixin, ProxiableMixin, {
       let value = this.value;
       let dragAmount = this.dragAmount;
 
-      if (!this.dragging || (value && dragAmount < 0.5) || (!value && dragAmount > 0.5)) {
+      if (
+        !this.dragging ||
+        (value && dragAmount < 0.5) ||
+        (!value && dragAmount > 0.5)
+      ) {
         invokeAction(this, 'onChange', !value);
       }
       this.set('dragging', false);
@@ -154,7 +169,10 @@ export default Component.extend(FocusableMixin, ColorMixin, ProxiableMixin, {
   },
 
   keyPress(ev) {
-    if (ev.which === this.get('constants.KEYCODE.SPACE') || ev.which === this.get('constants.KEYCODE.ENTER')) {
+    if (
+      ev.which === this.get('constants.KEYCODE.SPACE') ||
+      ev.which === this.get('constants.KEYCODE.ENTER')
+    ) {
       ev.preventDefault();
       this._dragEnd();
     }
@@ -162,6 +180,5 @@ export default Component.extend(FocusableMixin, ColorMixin, ProxiableMixin, {
 
   processProxy() {
     invokeAction(this, 'onChange', !this.value);
-  }
-
+  },
 });

@@ -1,4 +1,4 @@
-/* eslint-disable ember/no-classic-components, ember/no-mixins, ember/require-tagless-components, ember/require-computed-property-dependencies, ember/no-component-lifecycle-hooks, ember/no-get, ember/no-actions-hash */
+/* eslint-disable ember/no-actions-hash, ember/no-classic-components, ember/no-component-lifecycle-hooks, ember/no-get, ember/no-mixins, ember/require-computed-property-dependencies, ember/require-tagless-components */
 /**
  * @module ember-paper
  */
@@ -7,11 +7,9 @@ import { or, bool, and } from '@ember/object/computed';
 import Component from '@ember/component';
 import { computed, set } from '@ember/object';
 import { isEmpty } from '@ember/utils';
-import { run } from '@ember/runloop';
+import { bind, next } from '@ember/runloop';
 import { assert } from '@ember/debug';
-import layout from '../templates/components/paper-input';
 import FocusableMixin from 'ember-paper/mixins/focusable-mixin';
-import ColorMixin from 'ember-paper/mixins/color-mixin';
 import ChildMixin from 'ember-paper/mixins/child-mixin';
 import ValidationMixin from 'ember-paper/mixins/validation-mixin';
 import { invokeAction } from 'ember-paper/utils/invoke-action';
@@ -21,13 +19,12 @@ import { invokeAction } from 'ember-paper/utils/invoke-action';
  * @extends Ember.Component
  * @uses FocusableMixin
  * @uses ChildMixin
- * @uses ColorMixin
  * @uses ValidationMixin
  */
-export default Component.extend(FocusableMixin, ColorMixin, ChildMixin, ValidationMixin, {
-  layout,
+export default Component.extend(FocusableMixin, ChildMixin, ValidationMixin, {
   tagName: 'md-input-container',
   classNames: ['md-default-theme'],
+
   classNameBindings: [
     'hasValue:md-input-has-value',
     'isInvalidAndTouched:md-input-invalid',
@@ -35,26 +32,29 @@ export default Component.extend(FocusableMixin, ColorMixin, ChildMixin, Validati
     'hasRightIcon:md-icon-right',
     'focused:md-input-focused',
     'block:md-block',
-    'placeholder:md-input-has-placeholder'
+    'placeholder:md-input-has-placeholder',
+    'warn:md-warn',
+    'accent:md-accent',
+    'primary:md-primary',
   ],
+
   type: 'text',
   autofocus: false,
   tabindex: null,
   hideAllMessages: false,
   isTouched: false,
-
   iconComponent: 'paper-icon',
 
   // override validation mixin `isInvalid` to account for the native input validity
   isInvalid: or('hasErrorMessages', 'isNativeInvalid'),
 
-  hasValue: computed('value', 'isNativeInvalid', function() {
+  hasValue: computed('value', 'isNativeInvalid', function () {
     let value = this.value;
     let isNativeInvalid = this.isNativeInvalid;
     return !isEmpty(value) || isNativeInvalid;
   }),
 
-  shouldAddPlaceholder: computed('label', 'focused', function() {
+  shouldAddPlaceholder: computed('label', 'focused', function () {
     // if has label, only add placeholder when focused
     return isEmpty(this.label) || this.focused;
   }),
@@ -68,27 +68,28 @@ export default Component.extend(FocusableMixin, ColorMixin, ChildMixin, Validati
     // https://deprecations.emberjs.com/v3.x/#toc_computed-property-override
     set(key, value) {
       // To make sure the context updates properly, We are manually set value using @ember/object#set as recommended.
-      return set(this, "elementId", value);
-    }
+      return set(this, 'elementId', value);
+    },
   }),
 
-
-
-  renderCharCount: computed('value', function() {
-    let currentLength = this.value ? this.value.length : 0;
-    return `${currentLength}/${this.maxlength}`;
+  currentLength: computed('value', function () {
+    return this.value ? this.value.length : 0;
   }),
 
   hasLeftIcon: bool('icon'),
   hasRightIcon: bool('iconRight'),
   isInvalidAndTouched: and('isInvalid', 'isTouched'),
 
-  validationProperty: 'value', // property that validations should be run on
+  // property that validations should be run on
+  validationProperty: 'value',
 
   // Lifecycle hooks
   didReceiveAttrs() {
     this._super(...arguments);
-    assert('{{paper-input}} requires an `onChange` action or null for no action.', this.onChange !== undefined);
+    assert(
+      '{{paper-input}} requires an `onChange` action or null for no action.',
+      this.onChange !== undefined
+    );
 
     let { value, errors } = this;
     let { _prevValue, _prevErrors } = this;
@@ -102,7 +103,7 @@ export default Component.extend(FocusableMixin, ColorMixin, ChildMixin, Validati
   didInsertElement() {
     this._super(...arguments);
     if (this.textarea) {
-      this._growTextareaOnResize = run.bind(this, this.growTextarea);
+      this._growTextareaOnResize = bind(this, this.growTextarea);
       window.addEventListener('resize', this._growTextareaOnResize);
     }
   },
@@ -151,7 +152,6 @@ export default Component.extend(FocusableMixin, ColorMixin, ChildMixin, Validati
         } else {
           inputElement.classList.remove('md-textarea-scrollable');
         }
-
       } else {
         inputElement.style.height = 'auto';
         inputElement.scrollTop = 0;
@@ -184,7 +184,7 @@ export default Component.extend(FocusableMixin, ColorMixin, ChildMixin, Validati
     handleInput(e) {
       invokeAction(this, 'onChange', e.target.value);
       // setValue below ensures that the input value is the same as this.value
-      run.next(() => {
+      next(() => {
         if (this.isDestroyed) {
           return;
         }
@@ -192,7 +192,8 @@ export default Component.extend(FocusableMixin, ColorMixin, ChildMixin, Validati
       });
       this.growTextarea();
       let inputElement = this.element.querySelector('input');
-      let isNativeInvalid = inputElement && inputElement.validity && inputElement.validity.badInput;
+      let isNativeInvalid =
+        inputElement && inputElement.validity && inputElement.validity.badInput;
       if (this.type === 'date' && e.target.value === '') {
         // Chrome doesn't fire the onInput event when clearing the second and third date components.
         // This means that we won't see another event when badInput becomes false if the user is clearing
@@ -207,6 +208,6 @@ export default Component.extend(FocusableMixin, ColorMixin, ChildMixin, Validati
       invokeAction(this, 'onBlur', e);
       this.set('isTouched', true);
       this.notifyValidityChange();
-    }
-  }
+    },
+  },
 });

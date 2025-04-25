@@ -1,0 +1,16 @@
+{{! template-lint-disable no-action }}
+{{#unless this.closed}}
+  <PaperBackdrop @opaque={{true}} @class="md-sidenav-backdrop" @onClick={{action "onBackdropTap"}} />
+{{/unless}}
+
+<PaperSidenavInner
+  @class={{@class}}
+  @name={{this.name}}
+  @position={{this.position}}
+  @lockedOpen={{this.lockedOpen}}
+  @closed={{this.closed}}
+  @closeOnClick={{this.closeOnClick}}
+  @onToggle={{action "onToggle"}}
+  ...attributes>
+  {{yield}}
+</PaperSidenavInner>

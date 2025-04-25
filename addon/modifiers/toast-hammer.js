@@ -1,5 +1,6 @@
+/* eslint-disable prettier/prettier */
 import Modifier from 'ember-modifier';
-import { run } from '@ember/runloop';
+import { bind } from '@ember/runloop';
 
 /* global Hammer */
 
@@ -19,10 +20,10 @@ export default class ToastHammer extends Modifier {
       containerManager.add(swipe);
       containerManager.add(pan);
       containerManager
-        .on('panstart', run.bind(this, this.dragStart))
-        .on('panmove', run.bind(this, this.drag))
-        .on('panend', run.bind(this, this.dragEnd))
-        .on('swiperight swipeleft', run.bind(this, this.dragEnd));
+        .on('panstart', bind(this, this.dragStart))
+        .on('panmove', bind(this, this.drag))
+        .on('panend', bind(this, this.dragEnd))
+        .on('swiperight swipeleft', bind(this, this.dragEnd));
       this.hammer = containerManager;
     }
   }

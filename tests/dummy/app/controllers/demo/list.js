@@ -1,7 +1,7 @@
-/* eslint-disable ember/no-actions-hash */
+/* eslint-disable ember/no-actions-hash, prettier/prettier */
 import Controller from '@ember/controller';
 import { computed } from '@ember/object';
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 export default Controller.extend({
   numOfRows: 3,
@@ -12,9 +12,9 @@ export default Controller.extend({
 
     for (let i = 0; i < numOfRows; i++) {
       contacts.push({
-        name: faker.name.findName(),
+        name: faker.person.fullName(),
         email: faker.internet.email(),
-        img: faker.internet.avatar()
+        img: faker.image.dataUri()
       });
     }
 

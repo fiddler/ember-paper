@@ -1,11 +1,11 @@
-/* eslint-disable ember/no-classic-components, ember/no-computed-properties-in-native-classes, ember/classic-decorator-no-classic-methods */
+/* eslint-disable ember/classic-decorator-no-classic-methods, ember/no-classic-components, ember/no-computed-properties-in-native-classes, prettier/prettier */
 /**
  * @module ember-paper
  */
 import Component from '@ember/component';
 import { computed, action } from '@ember/object';
 import { bind } from '@ember/runloop';
-import { htmlSafe } from '@ember/string';
+import { htmlSafe } from '@ember/template';
 import template from './template';
 import clamp from 'ember-paper/utils/clamp';
 import { tagName, layout } from '@ember-decorators/component';

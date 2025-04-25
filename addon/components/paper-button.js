@@ -5,9 +5,7 @@
 import { reads } from '@ember/object/computed';
 
 import Component from '@ember/component';
-import layout from '../templates/components/paper-button';
 import FocusableMixin from 'ember-paper/mixins/focusable-mixin';
-import ColorMixin from 'ember-paper/mixins/color-mixin';
 import ProxiableMixin from 'ember-paper/mixins/proxiable-mixin';
 import { invokeAction } from 'ember-paper/utils/invoke-action';
 
@@ -15,33 +13,32 @@ import { invokeAction } from 'ember-paper/utils/invoke-action';
  * @class PaperButton
  * @extends Ember.Component
  * @uses FocusableMixin
- * @uses ColorMixin
  * @uses ProxiableMixin
  */
-export default Component.extend(FocusableMixin, ColorMixin, ProxiableMixin, {
-  layout,
+export default Component.extend(FocusableMixin, ProxiableMixin, {
   tagName: 'button',
   classNames: ['md-default-theme', 'md-button'],
   raised: false,
   iconButton: false,
-  fab: reads('mini'),  // circular button
+
+  // circular button
+  fab: reads('mini'),
+
   mini: false,
   type: 'button',
   href: null,
   target: null,
-  attributeBindings: [
-    'type',
-    'href',
-    'target',
-    'title',
-    'download',
-    'rel'
-  ],
+
+  attributeBindings: ['type', 'href', 'target', 'title', 'download', 'rel'],
+
   classNameBindings: [
     'raised:md-raised',
     'iconButton:md-icon-button',
     'fab:md-fab',
-    'mini:md-mini'
+    'mini:md-mini',
+    'warn:md-warn',
+    'accent:md-accent',
+    'primary:md-primary',
   ],
 
   init() {
@@ -49,7 +46,7 @@ export default Component.extend(FocusableMixin, ColorMixin, ProxiableMixin, {
     if (this.href) {
       this.setProperties({
         tagName: 'a',
-        type: null
+        type: null,
       });
     }
   },
@@ -58,5 +55,5 @@ export default Component.extend(FocusableMixin, ColorMixin, ProxiableMixin, {
     invokeAction(this, 'onClick', e);
     // Prevent bubbling, if specified. If undefined, the event will bubble.
     return this.bubbles;
-  }
+  },
 });

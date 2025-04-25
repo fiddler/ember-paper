@@ -1,9 +1,10 @@
+/* eslint-disable prettier/prettier */
 /**
  * @module ember-paper
  */
 import Mixin from '@ember/object/mixin';
 
-import { run } from '@ember/runloop';
+import { next, later } from '@ember/runloop';
 import { ChildMixin } from 'ember-composability-tools';
 
 /**
@@ -18,7 +19,7 @@ export default Mixin.create(ChildMixin, {
   shouldRegister: false,
 
   registerWithParent() {
-    run.next(this, this._super);
+    next(this, this._super);
   },
 
   mouseDown() {
@@ -26,7 +27,7 @@ export default Mixin.create(ChildMixin, {
     let parentComponent = this.parentComponent;
     if (parentComponent) {
       parentComponent.set('mouseActive', true);
-      run.later(() => {
+      later(() => {
         if (parentComponent.isDestroyed) {
           return;
         }
