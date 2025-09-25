@@ -129,13 +129,16 @@ export default Component.extend(FocusableMixin, ColorMixin, ChildMixin, Validati
       inputElement.setAttribute('rows', 1);
 
       let minRows = this.get('passThru.rows');
-      let height = this.getHeight(inputElement);
       if (minRows) {
         if (!this.lineHeight) {
           inputElement.style.minHeight = 0;
           this.lineHeight = inputElement.clientHeight;
           inputElement.style.minHeight = null;
         }
+        // Reset height to auto to get accurate scrollHeight measurement
+        inputElement.style.height = 'auto';
+        inputElement.scrollTop = 0;
+        let height = this.getHeight(inputElement);
         if (this.lineHeight) {
           height = Math.max(height, this.lineHeight * minRows);
         }
