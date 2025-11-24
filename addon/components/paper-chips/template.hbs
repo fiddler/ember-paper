@@ -48,6 +48,7 @@
         {{#if (or @requireMatch @options)}}
           <PaperAutocomplete
             @inputClass="md-input"
+            @disabled={{@disabled}}
             @options={{@options}}
             @closeOnSelect={{true}}
             @defaultHighlighted={{paper-optional-action @defaultHighlighted}}

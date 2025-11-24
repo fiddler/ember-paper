@@ -20,7 +20,7 @@ import { tracked } from '@glimmer/tracking';
  */
 export default class PaperRadioGroup extends Component.extend(FocusableMixin) {
   tagName = 'md-radio-group';
-  tabindex = 0;
+  tabindex = null;
 
   /* FocusableMixin Overrides */
   focusOnlyOnKey = true;

@@ -44,9 +44,8 @@ export function calculateWormholedPosition(trigger, content, destination, { hori
     anchorPosition = window.getComputedStyle(anchorElement).position;
   }
   if (anchorPosition === 'relative' || anchorPosition === 'absolute') {
-    let rect = anchorElement.getBoundingClientRect();
-    triggerLeft = triggerLeft - rect.left;
-    triggerTop = triggerTop - rect.top;
+    triggerLeft = triggerLeft - anchorElement.offsetLeft;
+    triggerTop = triggerTop - anchorElement.offsetTop;
     let { offsetParent } = anchorElement;
     if (offsetParent) {
       triggerLeft -= anchorElement.offsetParent.scrollLeft;

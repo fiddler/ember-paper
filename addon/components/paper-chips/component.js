@@ -28,7 +28,9 @@ class PaperChips extends Component {
 
   @action
   handleClick(ev) {
-    ev.currentTarget.querySelector('.md-chip-input-container input').focus();
+    if (!this.readOnly) {
+      ev.currentTarget.querySelector('.md-chip-input-container input').focus();
+    }
   }
 
   @action
@@ -37,6 +39,8 @@ class PaperChips extends Component {
 
     if (!this.readOnly && isEmpty(input.value) && this.content.length) {
       this.keyboardNavigation(ev, input);
+    } else if (!this.readOnly && isPresent(input.value) && ev.key === 'Enter') {
+      this.handleInputKeydown(ev);
     }
   }
 
@@ -142,6 +146,7 @@ class PaperChips extends Component {
   @action
   handleInputKeydown(ev) {
     if (ev.key === 'Enter') {
+      ev.preventDefault();
       this.handleAddItem(ev.target.value);
       ev.target.value = '';
     }
