@@ -16,7 +16,8 @@
     @calculatePosition={{this.calculatePosition}}
     @extra={{hash label=@label}}
     @ebdTriggerComponent={{component "paper-select/ebd-trigger" label=@label selected=@selected required=@required disabled=@disabled}}
-    @triggerComponent={{component "paper-select/eps-trigger"}}
+    @allowClear={{@allowClear}}
+    @triggerComponent={{component "paper-select/eps-trigger" allowClear=@allowClear}}
     @triggerClass="{{if this.isInvalid "ng-invalid"}} {{if this.isTouched "ng-dirty"}}"
 
     @ebdContentComponent={{component "paper-select/ebd-content" searchEnabled=@searchEnabled select=this.publicAPI}}
