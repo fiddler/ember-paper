@@ -80,7 +80,7 @@ class PaperSelect extends Component.extend(ValidationMixin) {
     let contentNode = opts.contentEl;
     let parentRect = parentNode.getBoundingClientRect();
     let targetRect = targetNode.getBoundingClientRect();
-    let shouldOpenAroundTarget = false;
+    let shouldOpenAroundTarget = this.openAroundTarget !== false;
     let bounds = {
       left: parentRect.left + SELECT_EDGE_MARGIN,
       top: SELECT_EDGE_MARGIN,

@@ -229,7 +229,7 @@ class MenuPositionCalculator {
      */
     addOffsets() {
         this.position.top += this.offsets.top;
-        this.position.left + this.offsets.left
+        this.position.left += this.offsets.left;
     }
 
     /**
