@@ -117,9 +117,9 @@ class PaperSelect extends Component.extend(ValidationMixin) {
     if (contentNode.offsetWidth > maxWidth) {
       contentNode.style['max-width'] = `${maxWidth}px`;
     }
+    let triggerRect = shouldOpenAroundTarget ? opts.target.getBoundingClientRect() : null;
     if (shouldOpenAroundTarget) {
-      let triggerWidth = opts.target.getBoundingClientRect().width;
-      contentNode.style['min-width'] = `${triggerWidth}px`;
+      contentNode.style['min-width'] = `${triggerRect.width}px`;
     }
 
     // Remove padding before we compute the position of the menu
@@ -161,14 +161,14 @@ class PaperSelect extends Component.extend(ValidationMixin) {
     }
 
     if (shouldOpenAroundTarget) {
-      left = targetRect.left;
-      top = targetRect.top + targetRect.height;
+      left = triggerRect.left;
+      top = triggerRect.top + triggerRect.height;
       transformOrigin = '50% 0';
       if (top + selectMenuRect.height > bounds.bottom) {
-        top = targetRect.top - selectMenuRect.height;
+        top = triggerRect.top - selectMenuRect.height;
         transformOrigin = '50% 100%';
       }
-      containerNode.style.minWidth = `${opts.target.getBoundingClientRect().width}px`;
+      containerNode.style.minWidth = `${triggerRect.width}px`;
     } else {
       left = (targetRect.left + centeredRect.left - centeredRect.paddingLeft) + 2;
       top = Math.floor(targetRect.top + targetRect.height / 2 - centeredRect.height / 2
