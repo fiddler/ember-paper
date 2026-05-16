@@ -79,9 +79,16 @@ export default Component.extend({
       }
     };
 
+    // Tap-show on touch: brief auto-dismiss so the tooltip doesn't get stuck open
+    // when neither mouseleave nor touchcancel ever fires.
+    let touchLeaveHandler = () => {
+      later(leaveHandler, 2000);
+    };
+
     let enterEventHandler = () => {
       anchorElement.addEventListener('blur', leaveHandler);
       anchorElement.addEventListener('touchcancel', leaveHandler);
+      anchorElement.addEventListener('touchend', touchLeaveHandler);
       anchorElement.addEventListener('mouseleave', leaveHandler);
 
       if (!this.isDestroyed) {
