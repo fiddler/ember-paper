@@ -24,7 +24,7 @@
   @calculatePosition={{this.calculatePosition}}
   @extra={{hash label=@label labelPath=@labelPath required=@required passThru=@passThru inputClass=@inputClass}}
   @ebdTriggerComponent={{component "paper-autocomplete/ebd-trigger" label=@label disabled=@disabled}}
-  @triggerComponent={{component "paper-autocomplete/eps-trigger" isTouched=this.isTouched hideAllMessages=@hideAllMessages validationErrorMessages=@validationErrorMessages errors=@errors}}
+  @triggerComponent={{component "paper-autocomplete/eps-trigger" isTouched=this.isTouched hideAllMessages=@hideAllMessages validationErrorMessages=@validationErrorMessages errors=@errors attachToNearestForm=this.attachToNearestForm}}
 
   @ebdContentComponent={{component "paper-autocomplete/ebd-content" select=this.publicAPI}}
   @optionsComponent={{component "paper-autocomplete/options"}}

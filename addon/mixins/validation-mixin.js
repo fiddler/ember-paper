@@ -1,4 +1,4 @@
-/* eslint-disable ember/avoid-leaking-state-in-ember-objects, ember/no-get, prettier/prettier */
+/* eslint-disable ember/avoid-leaking-state-in-ember-objects, ember/no-get, ember/no-runloop, prettier/prettier */
 /**
  * @module ember-paper
  */
@@ -15,6 +15,8 @@ import maxValidator from 'ember-paper/validators/max';
 import minlengthValidator from 'ember-paper/validators/minlength';
 import maxlengthValidator from 'ember-paper/validators/maxlength';
 import { invokeAction } from 'ember-paper/utils/invoke-action';
+import { schedule } from '@ember/runloop';
+import formRegistry from 'ember-paper/utils/form-registry';
 
 
 // taken from ember source
@@ -107,6 +109,54 @@ export default Mixin.create({
       );
       defineProperty(this, 'validationErrorMessages', computedValidationMessages);
     }
+    // bound so templates can use {{did-insert this.attachToNearestForm}}
+    this.attachToNearestForm = this.attachToNearestForm.bind(this);
+    // contextual invocation (form.input / form.select / form.autocomplete)
+    // passes the form as parentComponent — register right away
+    if (this.parentComponent) {
+      this.parentComponent.register(this);
+    }
+  },
+
+  /**
+   * Registers this component with the nearest enclosing `paper-form`, found
+   * by walking up the DOM from `element` via the form-registry. Used when the
+   * component is invoked raw rather than through the form's yielded
+   * contextual components (which pass `parentComponent` explicitly).
+   *
+   * Deferred to afterRender because children insert bottom-up — the form has
+   * not added itself to the registry yet when a child's element lands.
+   *
+   * @public
+   * @param {HTMLElement} element  an element rendered by this component
+   */
+  attachToNearestForm(element) {
+    schedule('afterRender', () => {
+      if (this.isDestroying || this.isDestroyed || this.parentComponent) {
+        return;
+      }
+      let node = element;
+      while (node) {
+        let formElement = node.closest('form');
+        if (!formElement) {
+          return;
+        }
+        let form = formRegistry.get(formElement);
+        if (form) {
+          this.set('parentComponent', form);
+          form.register(this);
+          return;
+        }
+        node = formElement.parentElement;
+      }
+    });
+  },
+
+  willDestroy() {
+    if (this.parentComponent) {
+      this.parentComponent.deRegister(this);
+    }
+    this._super(...arguments);
   },
 
   hasErrorMessages: bool('validationErrorMessages.length'),

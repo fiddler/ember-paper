@@ -45,6 +45,12 @@ class PaperSelectEpsTrigger extends Component {
   @action
   didInsert(element) {
     this.triggerElement = element;
+    // lets the owning paper-autocomplete register with an enclosing
+    // paper-form — the autocomplete itself is tagless, so the trigger is the
+    // anchor element for the DOM lookup (no-op when invoked contextually)
+    if (this.attachToNearestForm) {
+      this.attachToNearestForm(element);
+    }
   }
 
   @action

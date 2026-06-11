@@ -2,7 +2,7 @@
 import Component from '@ember/component';
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render, triggerEvent, click } from '@ember/test-helpers';
+import { render, triggerEvent, click, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
 module('Integration | Component | paper form', function(hooks) {
@@ -341,5 +341,157 @@ module('Integration | Component | paper form', function(hooks) {
       .doesNotExist('paper-autocomplete component is not displayed');
     assert.dom('.custom-autocomplete')
       .exists({ count: 1 }, 'custom autocomplete-component is displayed');
+  });
+
+  test('raw paper-input auto-registers with the enclosing form', async function(assert) {
+    assert.expect(2);
+
+    await render(hbs`
+      <PaperForm as |form|>
+        <PaperInput @value={{this.foo}} @onChange={{fn (mut this.foo)}} @label="Foo" @required={{true}} />
+        {{#if form.isInvalid}}
+          <div class="invalid-div">Form is invalid!</div>
+        {{/if}}
+      </PaperForm>
+    `);
+
+    assert.dom('.invalid-div').exists({ count: 1 }, 'empty required raw input invalidates the form');
+
+    this.set('foo', 'abc');
+    await settled();
+
+    assert.dom('.invalid-div').doesNotExist('filled required raw input validates the form');
+  });
+
+  test('hidden raw paper-input with min enforces a count rule (hidden-input validation)', async function(assert) {
+    assert.expect(2);
+
+    this.set('count', 0);
+    await render(hbs`
+      <PaperForm as |form|>
+        <PaperInput @type="number" @hidden={{true}} @required={{true}} @min={{1}} @value={{this.count}} @onChange={{null}} />
+        {{#if form.isInvalid}}
+          <div class="invalid-div">Form is invalid!</div>
+        {{/if}}
+      </PaperForm>
+    `);
+
+    assert.dom('.invalid-div').exists({ count: 1 }, 'count below min invalidates the form');
+
+    this.set('count', 1);
+    await settled();
+
+    assert.dom('.invalid-div').doesNotExist('count at min validates the form');
+  });
+
+  test('raw paper-input outside the form does not affect form validity', async function(assert) {
+    assert.expect(1);
+
+    await render(hbs`
+      <PaperForm as |form|>
+        {{#if form.isInvalid}}
+          <div class="invalid-div">Form is invalid!</div>
+        {{/if}}
+      </PaperForm>
+      <PaperInput @value={{this.foo}} @onChange={{fn (mut this.foo)}} @label="Foo" @required={{true}} />
+    `);
+
+    assert.dom('.invalid-div').doesNotExist('outside input does not register');
+  });
+
+  test('destroyed raw paper-input deregisters from the form', async function(assert) {
+    assert.expect(2);
+
+    this.set('show', true);
+    await render(hbs`
+      <PaperForm as |form|>
+        {{#if this.show}}
+          <PaperInput @value={{this.foo}} @onChange={{fn (mut this.foo)}} @label="Foo" @required={{true}} />
+        {{/if}}
+        {{#if form.isInvalid}}
+          <div class="invalid-div">Form is invalid!</div>
+        {{/if}}
+      </PaperForm>
+    `);
+
+    assert.dom('.invalid-div').exists({ count: 1 });
+
+    this.set('show', false);
+    await settled();
+
+    assert.dom('.invalid-div').doesNotExist('removed input no longer invalidates the form');
+  });
+
+  test('raw paper-select auto-registers with the enclosing form', async function(assert) {
+    assert.expect(2);
+
+    this.set('sizes', ['small', 'medium', 'large']);
+    await render(hbs`
+      <PaperForm as |form|>
+        <PaperSelect @label="Size" @required={{true}} @options={{this.sizes}} @selected={{this.size}} @onChange={{fn (mut this.size)}} as |size|>
+          {{size}}
+        </PaperSelect>
+        {{#if form.isInvalid}}
+          <div class="invalid-div">Form is invalid!</div>
+        {{/if}}
+      </PaperForm>
+    `);
+
+    assert.dom('.invalid-div').exists({ count: 1 }, 'required select with no selection invalidates the form');
+
+    this.set('size', 'small');
+    await settled();
+
+    assert.dom('.invalid-div').doesNotExist('selected required select validates the form');
+  });
+
+  test('contextual form.select aggregates validation into form.isInvalid', async function(assert) {
+    assert.expect(2);
+
+    this.set('sizes', ['small', 'medium', 'large']);
+    await render(hbs`
+      <PaperForm as |form|>
+        <form.select @label="Size" @required={{true}} @options={{this.sizes}} @selected={{this.size}} @onChange={{fn (mut this.size)}} as |size|>
+          {{size}}
+        </form.select>
+        {{#if form.isInvalid}}
+          <div class="invalid-div">Form is invalid!</div>
+        {{/if}}
+      </PaperForm>
+    `);
+
+    assert.dom('.invalid-div').exists({ count: 1 }, 'required contextual select with no selection invalidates the form');
+
+    this.set('size', 'small');
+    await settled();
+
+    assert.dom('.invalid-div').doesNotExist('selected contextual select validates the form');
+  });
+
+  test('raw paper-autocomplete auto-registers with the enclosing form', async function(assert) {
+    assert.expect(2);
+
+    this.set('sizes', ['small', 'medium', 'large']);
+    await render(hbs`
+      <PaperForm as |form|>
+        <PaperAutocomplete
+          @label="Size"
+          @required={{true}}
+          @options={{this.sizes}}
+          @selected={{this.size}}
+          @onSelectionChange={{fn (mut this.size)}}
+        />
+        {{#if form.isInvalid}}
+          <div class="invalid-div">Form is invalid!</div>
+        {{/if}}
+      </PaperForm>
+    `);
+
+    assert.dom('.invalid-div').exists({ count: 1 }, 'required autocomplete with no selection invalidates the form');
+
+    this.set('size', 'small');
+    await settled();
+
+    assert.dom('.invalid-div').doesNotExist('selected required autocomplete validates the form');
   });
 });

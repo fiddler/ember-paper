@@ -6,6 +6,7 @@ import { action, set } from '@ember/object';
 import Component from '@ember/component';
 
 import { invokeAction } from 'ember-paper/utils/invoke-action';
+import formRegistry from 'ember-paper/utils/form-registry';
 import { tracked } from '@glimmer/tracking';
 
 /**
@@ -26,6 +27,9 @@ export default class PaperForm extends Component {
   @tracked childComponents = [];
 
   register = (newChild) => {
+    if (this.childComponents.includes(newChild)) {
+      return;
+    }
     this.childComponents = [...this.childComponents, newChild];
   }
 
@@ -46,6 +50,18 @@ export default class PaperForm extends Component {
   get isInvalidAndTouched() {
     return this.isInvalid && this.isTouched;
   };
+
+  // The element registry lets raw (non-contextual) validation children find
+  // this form via DOM ancestry — see ValidationMixin#attachToNearestForm.
+  didInsertElement() {
+    super.didInsertElement(...arguments);
+    formRegistry.set(this.element, this);
+  }
+
+  willDestroyElement() {
+    formRegistry.delete(this.element);
+    super.willDestroyElement(...arguments);
+  }
 
   submit() {
     this.localOnSubmit();

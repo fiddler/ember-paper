@@ -120,8 +120,10 @@ export default class extends Component.extend(FocusableMixin, ValidationMixin) {
   didInsertElement() {
     super.didInsertElement(...arguments);
 
-    if (this.parentComponent) {
-      this.parentComponent.register(this);
+    // contextual invocation registers via ValidationMixin#init; raw inputs
+    // find their enclosing paper-form through the DOM
+    if (!this.parentComponent) {
+      this.attachToNearestForm(this.element);
     }
 
     if (this.textarea) {
@@ -140,9 +142,6 @@ export default class extends Component.extend(FocusableMixin, ValidationMixin) {
   willDestroyElement() {
     super.willDestroyElement(...arguments);
 
-    if (this.parentComponent) {
-      this.parentComponent.deRegister(this);
-    }
     if (this.textarea) {
       window.removeEventListener('resize', this._growTextareaOnResize);
       this._growTextareaOnResize = null;
