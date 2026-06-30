@@ -91,7 +91,7 @@ export default class PaperForm extends Component {
     if (this.isInvalid) {
       this.childComponents.forEach((child) => set(child, 'isTouched', false));
       this.childComponents = [...this.childComponents];
-      this.onInvalid()
+      this.onInvalid?.();
     } else {
       this.onSubmit?.();
       this.childComponents.forEach((child) => set(child, 'isTouched', false));
