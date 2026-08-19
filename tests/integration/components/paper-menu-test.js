@@ -1,7 +1,7 @@
 /* eslint-disable ember/no-settled-after-test-helper, prettier/prettier, qunit/no-assert-logical-expression, qunit/require-expect */
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render, settled, click, findAll, triggerKeyEvent } from '@ember/test-helpers';
+import { render, settled, click, findAll, triggerKeyEvent, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
 module('Integration | Component | paper-menu', function(hooks) {
@@ -109,6 +109,44 @@ module('Integration | Component | paper-menu', function(hooks) {
     await settled();
     assert.dom('.md-backdrop').doesNotExist();
 
+  });
+
+  test('leave animation clone is inert and always removed', async function(assert) {
+    assert.expect(3);
+    await render(hbs`
+      <PaperMenu as |menu|>
+        <menu.trigger>
+          <PaperButton @iconButton={{true}}>
+            {{paper-icon "local_phone"}}
+          </PaperButton>
+        </menu.trigger>
+        <menu.content @width={{4}} as |content|>
+          <content.menu-item>
+            <span id="menu-item">Test</span>
+          </content.menu-item>
+        </menu.content>
+      </PaperMenu>
+    `);
+
+    await settled();
+    await click('.ember-basic-dropdown-trigger');
+    await settled();
+    assert.dom('.md-open-menu-container').exists({ count: 1 });
+
+    await click('.ember-basic-dropdown-trigger');
+
+    // While it fades out the clone still covers the menu's box, so it must not
+    // take clicks — otherwise it swallows every click over that area.
+    let clone = document.querySelector('[id$="--clone"]');
+    assert.ok(
+      !clone || window.getComputedStyle(clone).pointerEvents === 'none',
+      'leave-animation clone does not capture pointer events'
+    );
+
+    // Firefox resolves the clone's style only after `md-leave` is added, so no
+    // transition runs and `transitionend` never fires. The clone must still go.
+    await waitUntil(() => !document.querySelector('[id$="--clone"]'), { timeout: 2000 });
+    assert.dom('[id$="--clone"]').doesNotExist();
   });
 
   test('keydown changes focused element', async function(assert) {
